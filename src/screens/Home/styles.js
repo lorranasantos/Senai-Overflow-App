@@ -2,6 +2,8 @@ import styled from "styled-components/native";
 import colors from "../../styles/colors";
 import { StatusBar } from "react-native";
 import { TextDefault } from "../../styles/stylesGlobal";
+import { Icon } from "react-native-vector-icons/Icon";
+
 
 export const Container = styled.View`
     flex: 1;
@@ -33,3 +35,11 @@ export const TextToolBar = styled(TextDefault)`
     font-weight: bold;
     text-align:center;
 `;
+
+export const SignOutIcon = styled(Icon)`
+    position: absolute;
+    color: ${colors.light};
+    right: 4px;
+    font-size: 30px;
+`;
+

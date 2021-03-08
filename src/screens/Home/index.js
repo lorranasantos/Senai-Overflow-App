@@ -6,6 +6,8 @@ import CardQuestion from '../../components/CardQuestion';
 import {api} from '../../services/api';
 
 function Home(){ 
+    StatusBar.setBackgroundColor(colors.primary);
+    
     const [isLoadingFeed, setIsLoadingFeed] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [totalQuestions, setTotalQuestions] = useState(0);
@@ -39,11 +41,12 @@ function Home(){
           loadQuestions();
       },[]);
 
-     StatusBar.setBackgroundColor(colors.primary);
+    
     return(
     <Container>
         <ToolBar>
             <TextToolBar>SENAI OVERFLOW</TextToolBar>
+            <SignOut name="FaSignOutAlt" />
         </ToolBar>
         <FlatList
             data={questions}
