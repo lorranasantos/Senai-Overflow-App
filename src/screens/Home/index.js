@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StatusBar, FlatList } from "react-native";
-import { Container, ToolBar, TextToolBar } from './styles';
+import { Container, ToolBar, TextToolBar, SignOutIcon } from './styles';
 import colors from '../../styles/colors';
 import CardQuestion from '../../components/CardQuestion';
 import {api} from '../../services/api';
+import { signOut } from '../../services/security';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-function Home(){ 
+function Home({navigation}){ 
     StatusBar.setBackgroundColor(colors.primary);
     
     const [isLoadingFeed, setIsLoadingFeed] = useState(false);
@@ -37,16 +39,24 @@ function Home(){
         setIsLoadingFeed(false);
       };
 
+      
       useEffect(() =>{
           loadQuestions();
-      },[]);
-
-    
+        },[]);
+        
+    const handleSignOut = () =>{
+        signOut();
+        navigation.navigate("Login");
+    }
     return(
     <Container>
         <ToolBar>
             <TextToolBar>SENAI OVERFLOW</TextToolBar>
-            <SignOut name="FaSignOutAlt" />
+            <TouchableOpacity 
+                onPress={handleSignOut}
+                style={{ position: "absolute", right: 4}}>
+                <SignOutIcon name="sign-out"/> 
+            </TouchableOpacity> 
         </ToolBar>
         <FlatList
             data={questions}

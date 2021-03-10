@@ -4,7 +4,7 @@ import { TextDefault } from "../../styles/stylesGlobal";
 
 export const Content = styled.View`
     flex:1;
-    width: 100%;
+    width: 90%;
 
     align-items: center;
     justify-content: center;
@@ -24,7 +24,7 @@ export const TextInputLogin = styled.TextInput`
 `;
 
 export const Label = styled(TextDefault)`
-    width:100%;
+    width:96%;
     font-size: 16px;
     text-align: left;
     font-weight: bold;
