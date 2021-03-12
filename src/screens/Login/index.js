@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Container, ToolBar, TextToolBar } from "../../styles/stylesGlobal";
-import { TextInput, TouchableOpacity, StatusBar, Alert } from "react-native";
-import colors from "../../styles/colors";
-import { Content, TextInputLogin, Label } from "./style";
+import { Alert, StatusBar, TextInput, TouchableOpacity } from "react-native";
 import Button from "../../components/Button";
 import { api } from "../../services/api";
 import { signIn } from "../../services/security";
+import colors from "../../styles/colors";
+import { Container, ToolBar, TextToolBar } from "../../styles/stylesGlobal";
+import { Content, Label, TextInputLogin } from "./styles";
 
-function Login({navigation}) {
+function Login({ navigation }) {
   StatusBar.setBackgroundColor(colors.primary);
 
   const [login, setLogin] = useState({
@@ -15,24 +15,30 @@ function Login({navigation}) {
     password: "",
   });
 
-  const handleEmail = (e) =>{
-    setLogin({...login, email:e});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleEmail = (e) => {
+    setLogin({ ...login, email: e });
   };
 
-  const handlePassword =(e) =>{
-    setLogin({...login, password:e});
+  const handlePassword = (e) => {
+    setLogin({ ...login, password: e });
   };
 
-  const handleSubmit = async () =>{
+  const handleSubmit = async () => {
     try {
-      
-      const response = await api.post("/session", login);
+
+      setIsLoading(true);
+      const response = await api.post("/sessions", login);
 
       signIn(response.data);
 
-      navigation.navigate("Home");
+      setIsLoading(false);
 
+      navigation.navigate("Home");
+      
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
       if(error.response){
         Alert.alert("Ops", error.response.data.error);
@@ -52,25 +58,22 @@ function Login({navigation}) {
           placeholderTextColor={colors.lightTransparent}
           placeholder="Digite o seu e-mail"
           onChangeText={handleEmail}
-
         />
 
         <Label>Senha</Label>
         <TextInputLogin
           autoCompleteType="password"
-          placeholderTextColor={colors.lightTransparent}
           placeholder="Digite a sua senha"
+          placeholderTextColor={colors.lightTransparent}
           secureTextEntry={true}
           onChangeText={handlePassword}
         />
-        
-          <Button 
-            handlePress={handleSubmit}
-            text="Entrar"
-            disabled={login.email === "" ||  login.password === ""}
-            style={{ width: "95%" }}
-          />
-        
+        <Button
+          handlePress={handleSubmit}
+          text={isLoading ? "Verificando..." : "Entrar"}
+          disabled={isLoading || login.email === "" || login.password === ""}
+          style={{ width: "96%" }}
+        />
       </Content>
     </Container>
   );

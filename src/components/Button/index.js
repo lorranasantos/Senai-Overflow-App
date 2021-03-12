@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Text } from "./style";
+import { Container, Text } from "./styles";
 
 function Button({ text, handlePress, ...rest }) {
   return (

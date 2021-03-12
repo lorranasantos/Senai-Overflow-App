@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   CardHeader,
@@ -10,15 +10,16 @@ import {
   TextTitle,
   TextDescription,
   ImageQuestion,
+  CardFooter,
   ContainerInputAnswer,
   InputAnswer,
-  CardFooter,
   SendIcon,
   ContainerAnswer,
-} from "./style";
-import imageProfile from "../../../assets/foto_perfil.png";
+} from "./styles";
+import fotoPerfil from "../../../assets/foto_perfil.png";
 import colors from "../../styles/colors";
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity, Alert } from "react-native";
+import { api } from "../../services/api";
 
 function CardAnswer({ answer }) {
   return (
@@ -26,11 +27,11 @@ function CardAnswer({ answer }) {
       <CardHeader>
         <ImageProfile
           source={
-            answer.Student.image ? { uri: answer.Student.image } : imageProfile
+            answer.Student.image ? { uri: answer.Student.image } : fotoPerfil
           }
         />
         <HeaderContent>
-          <TextPoster>Por {answer.Student.name}</TextPoster>
+          <TextPoster>por {answer.Student.name}</TextPoster>
           <TextDate>em {answer.created_at}</TextDate>
         </HeaderContent>
       </CardHeader>
@@ -44,6 +45,44 @@ function CardAnswer({ answer }) {
 function CardQuestion({ question }) {
   const [showAnswers, setShowAnswers] = useState(false);
 
+  const [answers, setAnswers] = useState([]);
+
+  const[newAnswer, setNewAnswer] = useState([]);
+
+  useEffect(()=>{
+    setAnswers(question.Answers);
+  }, [])
+
+  const handleNewAnswer = async() =>{
+    try {
+      
+      const response = await api.post(`/questions/${question.id}/answers` ,{
+        description:newAnswer
+      });
+
+      const aluno = await getuser();
+
+      const answerAdded = {
+        id: response.data.id,
+        description: newAnswer,
+        created_at: response.data.createdAt,
+        Student:{
+          id: aluno.studentId,
+          name: aluno.name,
+          image: aluno.image,
+        },
+      };
+      setAnswers([...answers, answerAdded]);
+      setNewAnswer("");
+
+    } catch (error) {
+      console.error(error);
+      if(error.response){
+        Alert.alert("Ops", error.response.data.error);
+      }
+    }
+  };
+
   return (
     <Container>
       <CardHeader>
@@ -51,43 +90,52 @@ function CardQuestion({ question }) {
           source={
             question.Student.image
               ? { uri: question.Student.image }
-              : imageProfile
+              : fotoPerfil
           }
         />
         <HeaderContent>
-          <TextPoster>Por {question.Student.name}</TextPoster>
+          <TextPoster>por {question.Student.name}</TextPoster>
           <TextDate>em {question.created_at}</TextDate>
         </HeaderContent>
       </CardHeader>
       <CardBody>
         <TextTitle>{question.title}</TextTitle>
         <TextDescription>{question.description}</TextDescription>
-        <ImageQuestion
-          style={{ resizeMode: "contain" }}
-          source={{ uri: question.image }}
-        ></ImageQuestion>
+        {question.image && (
+          <ImageQuestion
+            style={{ resizeMode: "contain" }}
+            source={{ uri: question.image }}
+          />
+        )}
       </CardBody>
       <CardFooter>
         <TouchableOpacity onPress={() => setShowAnswers(!showAnswers)}>
           <TextPoster>
-            {question.Answers.length === 0
+            {answers.length === 0
               ? "Seja o primeiro a responder"
-              : question.Answers.length + " respostas"}
+              : answers.length + " respostas"}
           </TextPoster>
-          {showAnswers && question.Answers.length > 0 && (
-            <FlatList
-              data={question.Answers}
-              keyExtractor={(answer) => String(answer.id)}
-              renderItem={({ item: answer }) => <CardAnswer answer={answer} />}
-            />
-          )}
         </TouchableOpacity>
+        {showAnswers && answers.length > 0 && (
+          <FlatList
+            data={answers}
+            keyExtractor={(answer) => String(answer.id)}
+            renderItem={({ item: answer }) => <CardAnswer answer={answer} />}
+          />
+        )}
+
         <ContainerInputAnswer>
           <InputAnswer
             placeholder="Responda a essa pergunta"
             placeholderTextColor={colors.lightTransparent}
+            onChangeText={value => setNewAnswer(value)}
+            value={newAnswer}
           />
-          <SendIcon name="paper-plane" />
+          <TouchableOpacity style={{position: "absolute", right: 4}} 
+            onPress={handleNewAnswer}
+            disabled={!(newAnswer.length >= 10)}>
+            <SendIcon name="paper-plane" anabled={newAnswer.length >= 10}/>
+          </TouchableOpacity>
         </ContainerInputAnswer>
       </CardFooter>
     </Container>

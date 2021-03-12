@@ -31,7 +31,7 @@ export const setUser = async (student) => {
 };
 
 export const isSignedIn = async () => {
-  const user =  JSON.parse(await AsyncStorage.getItem(USER_KEY));
+  const user = JSON.parse(await AsyncStorage.getItem(USER_KEY));
 
   if (user && user.token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
@@ -40,4 +40,3 @@ export const isSignedIn = async () => {
 
   return false;
 };
-
